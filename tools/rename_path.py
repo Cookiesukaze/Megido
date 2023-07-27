@@ -14,3 +14,4 @@ def rename_path_function(path):
             file_name = file_name.replace(f'({current_number}).', f'({new_number}).')
         path = os.path.join(directory + os.sep + file_name)
     return path
+

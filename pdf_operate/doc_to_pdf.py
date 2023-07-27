@@ -1,35 +1,39 @@
-import comtypes.client
+from docx2pdf import convert
 from PyQt5.QtWidgets import QApplication, QFileDialog
 import os
-from tools import rename_path
+from tools import rename_path, change_extension
+from time import sleep
 
 
-def convert_function(ppt_paths, save_path):
-    for piece in ppt_paths:
+def convert_function(word_paths, save_path):
+    for piece in word_paths:
         result_name, extension = os.path.splitext(piece)
         result_name = result_name.split("/")[-1]
-        # 生成文件名为原文件名
+        # doc统一转换成docx
+        if extension == '.doc':
+            word_path = change_extension.doc_to_docx_function(piece, save_path[0])
+        else:
+            word_path = piece
+        # docx统一转换成pdf
         result_path = save_path[0] + "/" + result_name + '.pdf'
         result_path = rename_path.rename_path_function(result_path)
-        # 把正斜杠替换成反斜杠
-        result_path = result_path.replace('/', '\\')
-        ppt = comtypes.client.CreateObject("Powerpoint.Application", dynamic=True)
-        ppt.Visible = 1
-        result = ppt.Presentations.Open(piece)
-        result.SaveAs(result_path, 32)
-        result.close()
+        f = open(result_path, 'w')
+        f.close()
+        convert(word_path, result_path)
+        # sleep是必需的否则会报错
+        sleep(3)
     return
 
 
 def get_file_path():
     desktop_path = get_desktop_path()
-    file_filter = "*pptx"
+    file_filter = "*doc *docx"
     app = QApplication([])
     file_dialog = QFileDialog()
     # 设置可选文件类型为存在的多个文件
     file_dialog.setFileMode(QFileDialog.ExistingFiles)
     # 设置打开窗口名
-    file_dialog.setWindowTitle("选择一个或多个ppt文件")
+    file_dialog.setWindowTitle("选择一个或多个word文档文件")
     # 设置打开目录
     file_dialog.setDirectory(desktop_path)
     # 设置过滤器
@@ -64,8 +68,7 @@ if __name__ == "__main__":
 
 '''
 1.批量选择ppt ✓
-2.如果可以的话希望ppt不要显示在前台
+2.当前的doc是转换成docx后放到保存路径的
 3.原名称命名生成文件 ✓
-2.文件名选择 不想写，感觉没太大必要了
-3.图片质量选择
+4.图片质量选择
 '''
