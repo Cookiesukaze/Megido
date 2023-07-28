@@ -67,7 +67,7 @@ if __name__ == "__main__":
     convert_function(get_file_path(), get_save_path())
 
 '''
-1.批量选择ppt ✓
+1.批量选择doc ✓
 2.当前的doc是转换成docx后放到保存路径的
 3.原名称命名生成文件 ✓
 4.图片质量选择
