@@ -1,7 +1,7 @@
 import img2pdf
 from PyQt5.QtWidgets import QApplication, QFileDialog
 import os
-from tools import rename_path
+from tools import rename_path, file_sort_test
 
 
 def convert_function(img_paths, save_path):
@@ -57,7 +57,7 @@ def get_save_path():
 
 
 if __name__ == "__main__":
-    convert_function(get_file_path(), get_save_path())
+    convert_function(file_sort_test.get_sorted_file_path(get_file_path()), get_save_path())
 
 '''
 1.起始路径确定 ✓

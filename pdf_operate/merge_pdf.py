@@ -1,7 +1,7 @@
 import PyPDF2
 from PyQt5.QtWidgets import QApplication, QFileDialog
 import os
-from tools import rename_path
+from tools import rename_path, file_sort_test
 
 
 def convert_function(pdf_paths, save_path):
@@ -29,7 +29,6 @@ def get_file_path():
     file_dialog.setNameFilter(file_filter)
     if file_dialog.exec_():
         file_paths = file_dialog.selectedFiles()
-        print(file_paths)
         return file_paths
 
 
@@ -49,12 +48,11 @@ def get_save_path():
     save_dialog.setDirectory(desktop_path)
     if save_dialog.exec_():
         save_path = save_dialog.selectedFiles()
-        # print(save_path)
         return save_path
 
 
 if __name__ == "__main__":
-    convert_function(get_file_path(), get_save_path())
+    convert_function(file_sort_test.get_sorted_file_path(get_file_path()), get_save_path())
 
 '''
 1.自定义顺序的可视化pdf合并
