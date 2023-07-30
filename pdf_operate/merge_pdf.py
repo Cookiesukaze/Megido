@@ -55,5 +55,5 @@ if __name__ == "__main__":
     convert_function(file_sort_test.get_sorted_file_path(get_file_path()), get_save_path())
 
 '''
-1.自定义顺序的可视化pdf合并
+1.以pdf的图片为单位自定义排序
 '''
