@@ -1,127 +1,109 @@
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QListWidget, \
-    QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QListWidgetItem
-from PyQt5.QtCore import Qt
+import tkinter as tk
+from tkinter import ttk
+import time
 
 
-class DragDropListWidget(QListWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setAcceptDrops(True)
-        self.setDragDropMode(QListWidget.InternalMove)
-        self.setSelectionMode(QListWidget.ExtendedSelection)
-        self.setDragEnabled(True)
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.accept()
-        else:
-            super().dragEnterEvent(event)
-
-    def dragMoveEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.setDropAction(Qt.CopyAction)
-            event.accept()
-        else:
-            super().dragMoveEvent(event)
-
-    def dropEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.setDropAction(Qt.CopyAction)
-            event.accept()
-            for url in event.mimeData().urls():
-                file_path = str(url.toLocalFile())
-                item = QListWidgetItem(file_path)
-                self.addItem(item)
-        else:
-            super().dropEvent(event)
-
-
-class FileListWindow(QWidget):
-    def __init__(self):
+class FileListWindow(tk.Tk):
+    def __init__(self, file_paths):
         super().__init__()
 
-        # 初始化界面元素
-        self.file_list_widget = DragDropListWidget()
-        self.file_list_widget.setSelectionMode(QListWidget.ExtendedSelection)
-        self.sort_by_name_button = QPushButton("按名称排序")
-        self.sort_by_size_button = QPushButton("按大小排序")
-        self.sort_by_time_button = QPushButton("按时间排序")
-        self.sort_label = QLabel("")
-        self.close_button = QPushButton("确定")
-
-        # 设置界面布局
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.sort_by_name_button)
-        hbox.addWidget(self.sort_by_size_button)
-        hbox.addWidget(self.sort_by_time_button)
-        vbox = QVBoxLayout()
-        vbox.addWidget(self.file_list_widget)
-        vbox.addWidget(self.sort_label)
-        vbox.addLayout(hbox)
-        vbox.addWidget(self.close_button)
-        self.setLayout(vbox)
-
-        # 绑定界面元素的事件处理函数
-        self.sort_by_name_button.clicked.connect(self.sort_files_by_name)
-        self.sort_by_size_button.clicked.connect(self.sort_files_by_size)
-        self.sort_by_time_button.clicked.connect(self.sort_files_by_time)
-        self.close_button.clicked.connect(self.close_window)
-
         # 设置窗口标题
-        self.setWindowTitle("自定义排序")
+        self.title("自定义排序")
 
-    def sort_files_by_name(self):
-        items = [(self.file_list_widget.item(i).text(), i) for i in range(self.file_list_widget.count())]
-        items.sort()
-        self.file_list_widget.clear()
-        for item, _ in items:
-            self.file_list_widget.addItem(item)
-        self.sort_label.setText("已按名称排序")
+        # 初始化变量
+        self.sort_column = None
+        self.sort_reverse = False
+        self.file_paths = file_paths
 
-    def sort_files_by_size(self):
-        items = [(os.path.getsize(self.file_list_widget.item(i).text()), self.file_list_widget.item(i).text(), i)
-                 for i in range(self.file_list_widget.count())]
-        items.sort(reverse=True)
-        self.file_list_widget.clear()
-        for _, item, _ in items:
-            self.file_list_widget.addItem(item)
-        self.sort_label.setText("已按大小排序")
+        # 创建列表控件
+        self.tree = ttk.Treeview(self, columns=("路径", "大小", "修改时间"), show="headings")
+        self.tree.column("路径", width=300, anchor="w")
+        self.tree.column("大小", width=100, anchor="e")
+        self.tree.column("修改时间", width=150, anchor="e")
+        self.tree.heading("路径", text="路径", command=lambda: self.sort_by_column("路径"))
+        self.tree.heading("大小", text="大小", command=lambda: self.sort_by_column("大小"))
+        self.tree.heading("修改时间", text="修改时间", command=lambda: self.sort_by_column("修改时间"))
+        self.tree.pack(fill="both", expand=True)
 
-    def sort_files_by_time(self):
-        items = [(os.path.getmtime(self.file_list_widget.item(i).text()), self.file_list_widget.item(i).text(), i)
-                 for i in range(self.file_list_widget.count())]
-        items.sort(reverse=True)
-        self.file_list_widget.clear()
-        for _, item, _ in items:
-            self.file_list_widget.addItem(item)
-        self.sort_label.setText("已按时间排序")
+        # 加载文件列表
+        self.load_files()
+
+        # 注册拖放处理程序
+        self.tree.bind("<Button-1>", self.on_button_press)
+        self.tree.bind("<B1-Motion>", self.on_motion)
+        self.tree.bind("<ButtonRelease-1>", self.on_button_release)
+
+        # 创建按钮
+        sort_by_path_button = ttk.Button(self, text="按路径排序", command=lambda: self.sort_files_by_column("路径"))
+        sort_by_size_button = ttk.Button(self, text="按大小排序", command=lambda: self.sort_files_by_column("大小"))
+        sort_by_time_button = ttk.Button(self, text="按时间排序", command=lambda: self.sort_files_by_column("修改时间"))
+        close_button = ttk.Button(self, text="确定", command=self.close_window)
+        sort_by_path_button.pack(side="left", padx=5, pady=5)
+        sort_by_size_button.pack(side="left", padx=5, pady=5)
+        sort_by_time_button.pack(side="left", padx=5, pady=5)
+        close_button.pack(side="right", padx=5, pady=5)
+
+    def load_files(self):
+        for file_path in self.file_paths:
+            file_size = os.path.getsize(file_path)
+            file_time = os.path.getmtime(file_path)
+            file_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(file_time))
+            self.tree.insert("", "end", values=(file_path, file_size, file_time))
+
+    def sort_by_column(self, column):
+        if self.sort_column == column:
+            self.sort_reverse = not self.sort_reverse
+        else:
+            self.sort_column = column
+            self.sort_reverse = False
+        self.sort_files_by_column(column)
+
+    def sort_files_by_column(self, column):
+        items = [(self.tree.set(child, column), child) for child in self.tree.get_children("")]
+        items.sort(reverse=self.sort_reverse)
+        for index, (value, child) in enumerate(items):
+            self.tree.move(child, "", index)
+
+        # 重置所有列标题
+        for col in ("路径", "大小", "修改时间"):
+            if col == column:
+                self.tree.heading(col, text=col + (" ▼" if self.sort_reverse else " ▲"))
+            else:
+                self.tree.heading(col, text=col)
 
     def close_window(self):
-        self.close()
+        self.file_paths = [self.tree.set(child, "路径") for child in self.tree.get_children("")]
+        self.quit()
+
+    # 拖放处理程序
+    def on_button_press(self, event):
+        self._dragged_item = self.tree.identify_row(event.y)
+        if self._dragged_item == "":
+            return
+        self.tree.selection_set(self._dragged_item)
+
+    def on_motion(self, event):
+        if hasattr(self, '_dragged_item'):
+            self.tree.selection_remove(self._dragged_item)
+            self.tree.move(self._dragged_item, "", event.y // 60)
+            self.tree.selection_set(self._dragged_item)
+
+    def on_button_release(self, event):
+        if hasattr(self, '_dragged_item'):
+            del self._dragged_item
 
 
 def get_sorted_file_path(file_paths):
-    app = QApplication([])
-    # 创建文件列表窗口并显示文件列表
-    file_list_window = FileListWindow()
-    for file_path in file_paths:
-        item = QListWidgetItem(file_path)
-        file_list_window.file_list_widget.addItem(item)
-    file_list_window.show()
-    app.exec_()
-    # 打印文件排序后的顺序
-    sorted_items = [file_list_window.file_list_widget.item(i).text()
-                    for i in range(file_list_window.file_list_widget.count())]
+    app = FileListWindow(file_paths)
+    app.mainloop()
+    sorted_paths = app.file_paths
     print("文件顺序：")
-    for item in sorted_items:
-        print(item)
-
-    # 返回选择的文件路径列表
-    return sorted_items
+    for path in sorted_paths:
+        print(path)
+    return sorted_paths
 
 
-'''
-需要自定义排序的工具有：merge_pdf、img_to_pdf
-** 等待修改成使用tkinter实现
-'''
+# if __name__ == "__main__":
+#     get_sorted_file_path(('C:/Users/张奉静/Desktop/Shiroko_Avator.png', 'C:/Users/张奉静/Desktop/Snipaste_2023-06-14_16-51-53.png', 'C:/Users/张奉静/Desktop/yuu_Avatar.png'))
+#

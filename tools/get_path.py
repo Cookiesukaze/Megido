@@ -26,7 +26,6 @@ def get_img_file_path():
     file_dialog.title = '选择一张或多张图片'
     file_dialog.iconbitmap('')
     file_paths = filedialog.askopenfilenames(initialdir=(os.path.expanduser(desktop_path)), filetypes=file_filter)
-    print(file_paths)
     return file_paths
 
 
@@ -38,7 +37,6 @@ def get_word_file_path():
     file_dialog.title = '选择一个或多个文档文件'
     file_dialog.iconbitmap('')
     file_paths = filedialog.askopenfilenames(initialdir=(os.path.expanduser(desktop_path)), filetypes=file_filter)
-    print(file_paths)
     return file_paths
 
 
@@ -50,7 +48,6 @@ def get_pdf_file_path():
     file_dialog.title = '选择一个或多个PDF文件'
     file_dialog.iconbitmap('')
     file_paths = filedialog.askopenfilenames(initialdir=(os.path.expanduser(desktop_path)), filetypes=file_filter)
-    print(file_paths)
     return file_paths
 
 
@@ -62,5 +59,4 @@ def get_ppt_file_path():
     file_dialog.title = '选择一个或多个PPT文件'
     file_dialog.iconbitmap('')
     file_paths = filedialog.askopenfilenames(initialdir=(os.path.expanduser(desktop_path)), filetypes=file_filter)
-    print(file_paths)
     return file_paths
