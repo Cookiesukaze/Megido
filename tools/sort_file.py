@@ -5,6 +5,10 @@ from tkinter import ttk
 import time
 
 
+def exit_program():
+    sys.exit()
+
+
 class FileListWindow(tk.Tk):
     def __init__(self, file_paths):
         super().__init__()
@@ -45,11 +49,7 @@ class FileListWindow(tk.Tk):
         sort_by_time_button.pack(side="left", padx=5, pady=5)
         close_button.pack(side="right", padx=5, pady=5)
 
-        self.protocol("WM_DELETE_WINDOW", self.exit_program)
-
-    def exit_program(self):
-        """在用户尝试关闭窗口时停止程序"""
-        sys.exit()
+        self.protocol("WM_DELETE_WINDOW", exit_program)
 
     def load_files(self):
         for file_path in self.file_paths:
