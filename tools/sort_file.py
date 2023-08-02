@@ -1,4 +1,5 @@
 import os
+import sys
 import tkinter as tk
 from tkinter import ttk
 import time
@@ -43,6 +44,12 @@ class FileListWindow(tk.Tk):
         sort_by_size_button.pack(side="left", padx=5, pady=5)
         sort_by_time_button.pack(side="left", padx=5, pady=5)
         close_button.pack(side="right", padx=5, pady=5)
+
+        self.protocol("WM_DELETE_WINDOW", self.exit_program)
+
+    def exit_program(self):
+        """在用户尝试关闭窗口时停止程序"""
+        sys.exit()
 
     def load_files(self):
         for file_path in self.file_paths:
@@ -102,8 +109,3 @@ def get_sorted_file_path(file_paths):
     for path in sorted_paths:
         print(path)
     return sorted_paths
-
-
-# if __name__ == "__main__":
-#     get_sorted_file_path(('C:/Users/张奉静/Desktop/Shiroko_Avator.png', 'C:/Users/张奉静/Desktop/Snipaste_2023-06-14_16-51-53.png', 'C:/Users/张奉静/Desktop/yuu_Avatar.png'))
-#
