@@ -31,6 +31,18 @@ def get_img_file_path():
     return file_paths
 
 
+def get_single_img_file_path():
+    desktop_path = get_desktop_path()
+    file_filter = (("Img files", "*.jpeg"), ("Img files", "*.jpg"), ("Img files", "*.png"))
+    file_dialog = tk.Tk()
+    file_dialog.withdraw()
+    file_dialog.iconbitmap('')
+    file_paths = filedialog.askopenfilename(initialdir=(os.path.expanduser(desktop_path)), filetypes=file_filter)
+    if not file_paths:
+        sys.exit()
+    return file_paths
+
+
 def get_word_file_path():
     desktop_path = get_desktop_path()
     file_filter = (("文档文件", "*.doc"), ("文档文件", "*.docx"))
