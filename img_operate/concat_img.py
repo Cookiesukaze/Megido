@@ -87,6 +87,7 @@ if __name__ == "__main__":
     root.mainloop()
 
 '''
+!important
 1.窗口弹出美化 
 2.图片质量检查
 3.简化 
