@@ -20,9 +20,9 @@ def convert_function(pdf_paths, save_path):
             page = pdf[page_num]
             rotate = int(0)
             zoom_x, zoom_y = 5, 5  # 缩放5倍
-            matrix = fitz.Matrix(zoom_x, zoom_y).preRotate(rotate)
-            result = page.getPixmap(matrix=matrix, alpha=False)
-            result.writePNG(os.path.join(result_path, img_name))
+            matrix = fitz.Matrix(zoom_x, zoom_y).prerotate(rotate)
+            result = page.get_pixmap(matrix=matrix, alpha=False)
+            result.save(os.path.join(result_path, img_name))
     return
 
 
