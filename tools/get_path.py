@@ -69,7 +69,7 @@ def get_pdf_file_path():
 
 def get_ppt_file_path():
     desktop_path = get_desktop_path()
-    file_filter = (("PPT文件", "*.pptx"),)
+    file_filter = (("PPT文件", "*.pptx"),("PPT文件", "*.ppt"),("PPT文件", "*.pptm"))
     file_dialog = tk.Tk()
     file_dialog.withdraw()
     file_dialog.iconbitmap('')
